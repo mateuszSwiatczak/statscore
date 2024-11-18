@@ -1,0 +1,13 @@
+{
+    "name": "qafoo/gilded-rose-kata",
+    "autoload": {
+        "psr-4": {
+            "Tests\\": "tests/",
+            "App\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=8.1",
+        "phpunit/phpunit": "9.5"
+    }
+}
