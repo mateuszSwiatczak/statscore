@@ -2,31 +2,35 @@
 
 namespace App;
 
+use App\Enums\ItemTypeEnum;
+
 final class GildedRose
 {
+    private const SULFURAS_QUALITY = 80;
+
     public function updateQuality($item): void
     {
-        if ($this->isSulfuras($item)) {// Najłatwiej na początek wyrzucić z logiki najprostsze rozwiązania - eliminujemy jeden łatwy element
+        if ($this->isSulfuras($item)) { // Najłatwiej na początek wyrzucić z logiki najprostsze rozwiązania - eliminujemy jeden łatwy element
             $this->processSulfuras($item);
             return;
         }
 
-        $this->processQualityForStandardItems($item);// logika dla wszystkich itemów
-        $this->updateSellIn($item);// zawsze aktualizujemy na - datę do sprzedania
+        $this->processQualityForStandardItems($item); // logika dla wszystkich itemów
+        $this->updateSellIn($item); // zawsze aktualizujemy na - datę do sprzedania
 
-        if ($this->isAfterExpireDate($item)) {//Sprawdzamy czy jest po terminie ważności
+        if ($this->isAfterExpireDate($item)) { //Sprawdzamy czy jest po terminie ważności
             $this->processExpiredItem($item);
         }
     }
 
     private function isSulfuras($item): bool
     {
-        return $item->name === 'Sulfuras, Hand of Ragnaros';
+        return $item->name === ItemTypeEnum::SULFURAS->value;
     }
 
     private function processSulfuras($item): void
     {
-        $item->quality = 80;
+        $item->quality = self::SULFURAS_QUALITY;
         // - "**Sulfuras**", being a legendary item, never has to be sold or decreases in Quality
         // Just for clarification, an item can never have its Quality increase above 50, however "Sulfuras" is a legendary 
         // item and as such its Quality is 80 and it never alters.
@@ -45,7 +49,7 @@ final class GildedRose
     {
         $this->increaseQuality($item); //actually increases in Quality the older it gets
         //increase quality 1
-        if ($item->name === 'Backstage passes to a TAFKAL80ETC concert') {
+        if ($item->name === ItemTypeEnum::BACKSTAGE_PASS->value) {
             if ($item->sell_in < 11) {
                 $this->increaseQuality($item);
             } //increase quality 2
@@ -60,12 +64,12 @@ final class GildedRose
 
     private function isSelectedItem($item): bool
     {
-        return in_array($item->name, ['Backstage passes to a TAFKAL80ETC concert', 'Aged Brie']);
+        return in_array($item->name, [ItemTypeEnum::BACKSTAGE_PASS->value, ItemTypeEnum::AGED_BRIE->value]);
     }
 
     private function updateSellIn($item): void
     {
-        $item->sell_in--; 
+        $item->sell_in--;
     }
 
     private function increaseQuality($item,): void
@@ -89,9 +93,9 @@ final class GildedRose
 
     private function processExpiredItem($item): void
     {
-        if ($item->name === 'Aged Brie') {
+        if ($item->name === ItemTypeEnum::AGED_BRIE->value) {
             $this->increaseQuality($item); // Once the sell by date has passed, Quality degrades twice as fast //actually increases in Quality the older it gets
-        } elseif ($item->name === 'Backstage passes to a TAFKAL80ETC concert') {
+        } elseif ($item->name === ItemTypeEnum::BACKSTAGE_PASS->value) {
             $item->quality = 0; // Quality drops to 0 after the concert
         } else {
             $this->decreaseQuality($item); // Once the sell by date has passed, Quality degrades twice as fast
